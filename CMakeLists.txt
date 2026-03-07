@@ -5,25 +5,23 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
-if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /std:c11)
-endif()
-
 set(SOURCES
 	src/main.c
 	src/Command/Handler.c
 	src/Helper/Helper.c
 )
 
-include_directories(src)
-
-add_executable(${PROJECT_NAME}
+add_executable(Terminal
 	${SOURCES}
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-	${CMAKE_SOURCE_DIR}/src
+target_include_directories(Terminal PRIVATE
+	src
 )
+
+if(MSVC)
+    target_compile_options(Terminal PRIVATE /std:c11)
+endif()
 
 set(ASM_OUTPUT_DIR "${CMAKE_SOURCE_DIR}/assembly")
 file(MAKE_DIRECTORY "${ASM_OUTPUT_DIR}")
