@@ -5,6 +5,11 @@
     #include <windows.h>
     #define atomic_int LONG
     #define atomic_load(x) InterlockedExchangeAdd(x, 0)
+
+	#define popen _popen
+    #define pclose _pclose
+    #define strdup _strdup
+    #define strtok_s strtok_s
 #else
     #include <stdatomic.h>
 #endif
