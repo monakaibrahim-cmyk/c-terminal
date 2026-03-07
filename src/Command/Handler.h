@@ -1,10 +1,7 @@
 #ifndef COMMAND_HANDLER_H
 #define COMMAND_HANDLER_H
 
-#include <time.h>
 #include <stdatomic.h>
-
-#define tprintf(format, ...) print_with_timestamp(format, ##__VA_ARGS__)
 
 typedef void (*command_func)(int argc, char** argv);
 
@@ -26,7 +23,6 @@ typedef struct
 
 
 void handle(char* input);
-void print_with_timestamp(const char* format, ...);
 
 extern Command commands[];
 extern const int commands_count;

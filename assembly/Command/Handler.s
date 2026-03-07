@@ -15,9 +15,9 @@ mutex:
 is_busy:
 	.zero	4
 	.text
-	.globl	StringToLower
-	.type	StringToLower, @function
-StringToLower:
+	.globl	get_command_index
+	.type	get_command_index, @function
+get_command_index:
 .LFB6:
 	.cfi_startproc
 	endbr64
@@ -26,227 +26,11 @@ StringToLower:
 	.cfi_offset 6, -16
 	mov	rbp, rsp
 	.cfi_def_cfa_register 6
-	sub	rsp, 16
-	mov	QWORD PTR -8[rbp], rdi
+	sub	rsp, 32
+	mov	QWORD PTR -24[rbp], rdi
+	mov	DWORD PTR -4[rbp], 0
 	jmp	.L2
-.L3:
-	mov	rax, QWORD PTR -8[rbp]
-	movzx	eax, BYTE PTR [rax]
-	movzx	eax, al
-	mov	edi, eax
-	call	tolower@PLT
-	mov	edx, eax
-	mov	rax, QWORD PTR -8[rbp]
-	mov	BYTE PTR [rax], dl
-	add	QWORD PTR -8[rbp], 1
-.L2:
-	mov	rax, QWORD PTR -8[rbp]
-	movzx	eax, BYTE PTR [rax]
-	test	al, al
-	jne	.L3
-	nop
-	nop
-	leave
-	.cfi_def_cfa 7, 8
-	ret
-	.cfi_endproc
-.LFE6:
-	.size	StringToLower, .-StringToLower
-	.section	.rodata
-	.align 8
-.LC0:
-	.string	"DEBUG: Rejected char at index %d: '%c' (ASCII %d)\n"
-	.text
-	.globl	is_safe_hostname
-	.type	is_safe_hostname, @function
-is_safe_hostname:
-.LFB7:
-	.cfi_startproc
-	endbr64
-	push	rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	mov	rbp, rsp
-	.cfi_def_cfa_register 6
-	sub	rsp, 32
-	mov	QWORD PTR -24[rbp], rdi
-	cmp	QWORD PTR -24[rbp], 0
-	je	.L5
-	mov	rax, QWORD PTR -24[rbp]
-	movzx	eax, BYTE PTR [rax]
-	test	al, al
-	jne	.L6
 .L5:
-	mov	eax, 0
-	jmp	.L7
-.L6:
-	mov	DWORD PTR -4[rbp], 0
-	jmp	.L8
-.L10:
-	call	__ctype_b_loc@PLT
-	mov	rax, QWORD PTR [rax]
-	mov	edx, DWORD PTR -4[rbp]
-	movsx	rcx, edx
-	mov	rdx, QWORD PTR -24[rbp]
-	add	rdx, rcx
-	movzx	edx, BYTE PTR [rdx]
-	movzx	edx, dl
-	add	rdx, rdx
-	add	rax, rdx
-	movzx	eax, WORD PTR [rax]
-	movzx	eax, ax
-	and	eax, 8
-	test	eax, eax
-	jne	.L9
-	mov	eax, DWORD PTR -4[rbp]
-	movsx	rdx, eax
-	mov	rax, QWORD PTR -24[rbp]
-	add	rax, rdx
-	movzx	eax, BYTE PTR [rax]
-	cmp	al, 46
-	je	.L9
-	mov	eax, DWORD PTR -4[rbp]
-	movsx	rdx, eax
-	mov	rax, QWORD PTR -24[rbp]
-	add	rax, rdx
-	movzx	eax, BYTE PTR [rax]
-	cmp	al, 45
-	je	.L9
-	mov	eax, DWORD PTR -4[rbp]
-	movsx	rdx, eax
-	mov	rax, QWORD PTR -24[rbp]
-	add	rax, rdx
-	movzx	eax, BYTE PTR [rax]
-	movsx	ecx, al
-	mov	eax, DWORD PTR -4[rbp]
-	movsx	rdx, eax
-	mov	rax, QWORD PTR -24[rbp]
-	add	rax, rdx
-	movzx	eax, BYTE PTR [rax]
-	movsx	edx, al
-	mov	eax, DWORD PTR -4[rbp]
-	mov	esi, eax
-	lea	rax, .LC0[rip]
-	mov	rdi, rax
-	mov	eax, 0
-	call	printf@PLT
-	mov	eax, 0
-	jmp	.L7
-.L9:
-	add	DWORD PTR -4[rbp], 1
-.L8:
-	mov	eax, DWORD PTR -4[rbp]
-	movsx	rdx, eax
-	mov	rax, QWORD PTR -24[rbp]
-	add	rax, rdx
-	movzx	eax, BYTE PTR [rax]
-	test	al, al
-	jne	.L10
-	mov	eax, 1
-.L7:
-	leave
-	.cfi_def_cfa 7, 8
-	ret
-	.cfi_endproc
-.LFE7:
-	.size	is_safe_hostname, .-is_safe_hostname
-	.section	.rodata
-.LC1:
-	.string	"[%H:%M:%S] "
-.LC2:
-	.string	"%s"
-	.text
-	.globl	print_with_timestamp
-	.type	print_with_timestamp, @function
-print_with_timestamp:
-.LFB8:
-	.cfi_startproc
-	endbr64
-	push	rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	mov	rbp, rsp
-	.cfi_def_cfa_register 6
-	sub	rsp, 272
-	mov	QWORD PTR -264[rbp], rdi
-	mov	QWORD PTR -168[rbp], rsi
-	mov	QWORD PTR -160[rbp], rdx
-	mov	QWORD PTR -152[rbp], rcx
-	mov	QWORD PTR -144[rbp], r8
-	mov	QWORD PTR -136[rbp], r9
-	test	al, al
-	je	.L12
-	movaps	XMMWORD PTR -128[rbp], xmm0
-	movaps	XMMWORD PTR -112[rbp], xmm1
-	movaps	XMMWORD PTR -96[rbp], xmm2
-	movaps	XMMWORD PTR -80[rbp], xmm3
-	movaps	XMMWORD PTR -64[rbp], xmm4
-	movaps	XMMWORD PTR -48[rbp], xmm5
-	movaps	XMMWORD PTR -32[rbp], xmm6
-	movaps	XMMWORD PTR -16[rbp], xmm7
-.L12:
-	mov	rax, QWORD PTR fs:40
-	mov	QWORD PTR -184[rbp], rax
-	xor	eax, eax
-	lea	rax, -248[rbp]
-	mov	rdi, rax
-	call	time@PLT
-	lea	rax, -248[rbp]
-	mov	rdi, rax
-	call	localtime@PLT
-	mov	QWORD PTR -240[rbp], rax
-	mov	rdx, QWORD PTR -240[rbp]
-	lea	rax, -208[rbp]
-	mov	rcx, rdx
-	lea	rdx, .LC1[rip]
-	mov	esi, 20
-	mov	rdi, rax
-	call	strftime@PLT
-	lea	rax, -208[rbp]
-	mov	rsi, rax
-	lea	rax, .LC2[rip]
-	mov	rdi, rax
-	mov	eax, 0
-	call	printf@PLT
-	mov	DWORD PTR -232[rbp], 8
-	mov	DWORD PTR -228[rbp], 48
-	lea	rax, 16[rbp]
-	mov	QWORD PTR -224[rbp], rax
-	lea	rax, -176[rbp]
-	mov	QWORD PTR -216[rbp], rax
-	lea	rdx, -232[rbp]
-	mov	rax, QWORD PTR -264[rbp]
-	mov	rsi, rdx
-	mov	rdi, rax
-	call	vprintf@PLT
-	nop
-	mov	rax, QWORD PTR -184[rbp]
-	sub	rax, QWORD PTR fs:40
-	je	.L13
-	call	__stack_chk_fail@PLT
-.L13:
-	leave
-	.cfi_def_cfa 7, 8
-	ret
-	.cfi_endproc
-.LFE8:
-	.size	print_with_timestamp, .-print_with_timestamp
-	.globl	get_command_index
-	.type	get_command_index, @function
-get_command_index:
-.LFB9:
-	.cfi_startproc
-	endbr64
-	push	rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	mov	rbp, rsp
-	.cfi_def_cfa_register 6
-	sub	rsp, 32
-	mov	QWORD PTR -24[rbp], rdi
-	mov	DWORD PTR -4[rbp], 0
-	jmp	.L15
-.L18:
 	mov	eax, DWORD PTR -4[rbp]
 	movsx	rdx, eax
 	mov	rax, rdx
@@ -261,27 +45,27 @@ get_command_index:
 	mov	rdi, rax
 	call	strcmp@PLT
 	test	eax, eax
-	jne	.L16
+	jne	.L3
 	mov	eax, DWORD PTR -4[rbp]
-	jmp	.L17
-.L16:
+	jmp	.L4
+.L3:
 	add	DWORD PTR -4[rbp], 1
-.L15:
+.L2:
 	mov	eax, 4
 	cmp	DWORD PTR -4[rbp], eax
-	jl	.L18
+	jl	.L5
 	mov	eax, -1
-.L17:
+.L4:
 	leave
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE9:
+.LFE6:
 	.size	get_command_index, .-get_command_index
 	.globl	wrapper
 	.type	wrapper, @function
 wrapper:
-.LFB10:
+.LFB7:
 	.cfi_startproc
 	endbr64
 	push	rbp
@@ -309,8 +93,8 @@ wrapper:
 	mov	edi, eax
 	call	rcx
 	mov	DWORD PTR -20[rbp], 0
-	jmp	.L20
-.L21:
+	jmp	.L7
+.L8:
 	mov	rax, QWORD PTR -16[rbp]
 	mov	rax, QWORD PTR 16[rax]
 	mov	edx, DWORD PTR -20[rbp]
@@ -321,11 +105,11 @@ wrapper:
 	mov	rdi, rax
 	call	free@PLT
 	add	DWORD PTR -20[rbp], 1
-.L20:
+.L7:
 	mov	rax, QWORD PTR -16[rbp]
 	mov	eax, DWORD PTR 8[rax]
 	cmp	DWORD PTR -20[rbp], eax
-	jl	.L21
+	jl	.L8
 	mov	rax, QWORD PTR -16[rbp]
 	mov	rax, QWORD PTR 16[rax]
 	mov	rdi, rax
@@ -339,31 +123,31 @@ wrapper:
 	mov	eax, 0
 	mov	rdx, QWORD PTR -8[rbp]
 	sub	rdx, QWORD PTR fs:40
-	je	.L23
+	je	.L10
 	call	__stack_chk_fail@PLT
-.L23:
+.L10:
 	leave
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE10:
+.LFE7:
 	.size	wrapper, .-wrapper
 	.section	.rodata
-.LC3:
+.LC0:
 	.string	"Description: %s\n"
-.LC4:
+.LC1:
 	.string	"Usage:       %s\n"
-.LC5:
+.LC2:
 	.string	"Unknown Command: '%s'\n"
-.LC6:
+.LC3:
 	.string	"Available Commands:"
-.LC7:
+.LC4:
 	.string	"  %-10s - %s\n"
 	.text
 	.globl	cmd_help
 	.type	cmd_help, @function
 cmd_help:
-.LFB11:
+.LFB8:
 	.cfi_startproc
 	endbr64
 	push	rbp
@@ -378,10 +162,10 @@ cmd_help:
 	mov	rdi, rax
 	call	pthread_mutex_lock@PLT
 	cmp	DWORD PTR -20[rbp], 1
-	jle	.L25
+	jle	.L12
 	mov	DWORD PTR -8[rbp], 0
-	jmp	.L26
-.L29:
+	jmp	.L13
+.L16:
 	mov	eax, DWORD PTR -8[rbp]
 	movsx	rdx, eax
 	mov	rax, rdx
@@ -398,7 +182,7 @@ cmd_help:
 	mov	rdi, rax
 	call	strcmp@PLT
 	test	eax, eax
-	jne	.L27
+	jne	.L14
 	mov	eax, DWORD PTR -8[rbp]
 	movsx	rdx, eax
 	mov	rax, rdx
@@ -409,7 +193,7 @@ cmd_help:
 	lea	rax, commands[rip+8]
 	mov	rax, QWORD PTR [rdx+rax]
 	mov	rsi, rax
-	lea	rax, .LC3[rip]
+	lea	rax, .LC0[rip]
 	mov	rdi, rax
 	mov	eax, 0
 	call	printf@PLT
@@ -423,36 +207,36 @@ cmd_help:
 	lea	rax, commands[rip+16]
 	mov	rax, QWORD PTR [rdx+rax]
 	mov	rsi, rax
-	lea	rax, .LC4[rip]
+	lea	rax, .LC1[rip]
 	mov	rdi, rax
 	mov	eax, 0
 	call	printf@PLT
 	lea	rax, mutex[rip]
 	mov	rdi, rax
 	call	pthread_mutex_unlock@PLT
-	jmp	.L24
-.L27:
+	jmp	.L11
+.L14:
 	add	DWORD PTR -8[rbp], 1
-.L26:
+.L13:
 	mov	eax, 4
 	cmp	DWORD PTR -8[rbp], eax
-	jl	.L29
+	jl	.L16
 	mov	rax, QWORD PTR -32[rbp]
 	add	rax, 8
 	mov	rax, QWORD PTR [rax]
 	mov	rsi, rax
-	lea	rax, .LC5[rip]
+	lea	rax, .LC2[rip]
 	mov	rdi, rax
 	mov	eax, 0
 	call	printf@PLT
-	jmp	.L30
-.L25:
-	lea	rax, .LC6[rip]
+	jmp	.L17
+.L12:
+	lea	rax, .LC3[rip]
 	mov	rdi, rax
 	call	puts@PLT
 	mov	DWORD PTR -4[rbp], 0
-	jmp	.L31
-.L32:
+	jmp	.L18
+.L19:
 	mov	eax, DWORD PTR -4[rbp]
 	movsx	rdx, eax
 	mov	rax, rdx
@@ -473,37 +257,37 @@ cmd_help:
 	mov	rax, QWORD PTR [rdx+rax]
 	mov	rdx, rcx
 	mov	rsi, rax
-	lea	rax, .LC7[rip]
+	lea	rax, .LC4[rip]
 	mov	rdi, rax
 	mov	eax, 0
 	call	printf@PLT
 	add	DWORD PTR -4[rbp], 1
-.L31:
+.L18:
 	mov	eax, 4
 	cmp	DWORD PTR -4[rbp], eax
-	jl	.L32
-.L30:
+	jl	.L19
+.L17:
 	mov	rax, QWORD PTR stdout[rip]
 	mov	rdi, rax
 	call	fflush@PLT
 	lea	rax, mutex[rip]
 	mov	rdi, rax
 	call	pthread_mutex_unlock@PLT
-.L24:
+.L11:
 	leave
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE11:
+.LFE8:
 	.size	cmd_help, .-cmd_help
 	.section	.rodata
-.LC8:
+.LC5:
 	.string	"\033[H\033[J"
 	.text
 	.globl	cmd_clear
 	.type	cmd_clear, @function
 cmd_clear:
-.LFB12:
+.LFB9:
 	.cfi_startproc
 	endbr64
 	push	rbp
@@ -514,7 +298,7 @@ cmd_clear:
 	sub	rsp, 16
 	mov	DWORD PTR -4[rbp], edi
 	mov	QWORD PTR -16[rbp], rsi
-	lea	rax, .LC8[rip]
+	lea	rax, .LC5[rip]
 	mov	rdi, rax
 	mov	eax, 0
 	call	printf@PLT
@@ -526,27 +310,27 @@ cmd_clear:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE12:
+.LFE9:
 	.size	cmd_clear, .-cmd_clear
 	.section	.rodata
-.LC9:
+.LC6:
 	.string	"ping"
 	.align 8
-.LC10:
+.LC7:
 	.string	"Error: Invalid characters in hostname."
-.LC11:
+.LC8:
 	.string	"ping -c 4 %s"
-.LC12:
+.LC9:
 	.string	"r"
-.LC13:
+.LC10:
 	.string	"Failed to run ping."
-.LC14:
+.LC11:
 	.string	"[%s] %s"
 	.text
 	.globl	cmd_ping
 	.type	cmd_ping, @function
 cmd_ping:
-.LFB13:
+.LFB10:
 	.cfi_startproc
 	endbr64
 	push	rbp
@@ -560,12 +344,12 @@ cmd_ping:
 	mov	rax, QWORD PTR fs:40
 	mov	QWORD PTR -8[rbp], rax
 	xor	eax, eax
-	lea	rax, .LC9[rip]
+	lea	rax, .LC6[rip]
 	mov	rdi, rax
 	call	get_command_index
 	mov	DWORD PTR -540[rbp], eax
 	cmp	DWORD PTR -548[rbp], 1
-	jg	.L35
+	jg	.L22
 	lea	rax, mutex[rip]
 	mov	rdi, rax
 	call	pthread_mutex_lock@PLT
@@ -583,15 +367,44 @@ cmd_ping:
 	lea	rax, mutex[rip]
 	mov	rdi, rax
 	call	pthread_mutex_unlock@PLT
-	jmp	.L34
-.L35:
+	jmp	.L21
+.L22:
 	mov	rax, QWORD PTR -560[rbp]
 	add	rax, 8
 	mov	rax, QWORD PTR [rax]
 	mov	rdi, rax
-	call	is_safe_hostname
+	call	is_safe_hostname@PLT
 	test	eax, eax
-	jne	.L37
+	jne	.L24
+	lea	rax, mutex[rip]
+	mov	rdi, rax
+	call	pthread_mutex_lock@PLT
+	lea	rax, .LC7[rip]
+	mov	rdi, rax
+	call	puts@PLT
+	lea	rax, mutex[rip]
+	mov	rdi, rax
+	call	pthread_mutex_unlock@PLT
+	jmp	.L21
+.L24:
+	mov	rax, QWORD PTR -560[rbp]
+	add	rax, 8
+	mov	rdx, QWORD PTR [rax]
+	lea	rax, -528[rbp]
+	mov	rcx, rdx
+	lea	rdx, .LC8[rip]
+	mov	esi, 256
+	mov	rdi, rax
+	mov	eax, 0
+	call	snprintf@PLT
+	lea	rax, -528[rbp]
+	lea	rdx, .LC9[rip]
+	mov	rsi, rdx
+	mov	rdi, rax
+	call	popen@PLT
+	mov	QWORD PTR -536[rbp], rax
+	cmp	QWORD PTR -536[rbp], 0
+	jne	.L26
 	lea	rax, mutex[rip]
 	mov	rdi, rax
 	call	pthread_mutex_lock@PLT
@@ -601,37 +414,8 @@ cmd_ping:
 	lea	rax, mutex[rip]
 	mov	rdi, rax
 	call	pthread_mutex_unlock@PLT
-	jmp	.L34
-.L37:
-	mov	rax, QWORD PTR -560[rbp]
-	add	rax, 8
-	mov	rdx, QWORD PTR [rax]
-	lea	rax, -528[rbp]
-	mov	rcx, rdx
-	lea	rdx, .LC11[rip]
-	mov	esi, 256
-	mov	rdi, rax
-	mov	eax, 0
-	call	snprintf@PLT
-	lea	rax, -528[rbp]
-	lea	rdx, .LC12[rip]
-	mov	rsi, rdx
-	mov	rdi, rax
-	call	popen@PLT
-	mov	QWORD PTR -536[rbp], rax
-	cmp	QWORD PTR -536[rbp], 0
-	jne	.L39
-	lea	rax, mutex[rip]
-	mov	rdi, rax
-	call	pthread_mutex_lock@PLT
-	lea	rax, .LC13[rip]
-	mov	rdi, rax
-	call	puts@PLT
-	lea	rax, mutex[rip]
-	mov	rdi, rax
-	call	pthread_mutex_unlock@PLT
-	jmp	.L34
-.L40:
+	jmp	.L21
+.L27:
 	lea	rax, mutex[rip]
 	mov	rdi, rax
 	call	pthread_mutex_lock@PLT
@@ -640,48 +424,48 @@ cmd_ping:
 	mov	rax, QWORD PTR [rax]
 	lea	rdx, -272[rbp]
 	mov	rsi, rax
-	lea	rax, .LC14[rip]
+	lea	rax, .LC11[rip]
 	mov	rdi, rax
 	mov	eax, 0
-	call	print_with_timestamp
+	call	print_with_timestamp@PLT
 	mov	rax, QWORD PTR stdout[rip]
 	mov	rdi, rax
 	call	fflush@PLT
 	lea	rax, mutex[rip]
 	mov	rdi, rax
 	call	pthread_mutex_unlock@PLT
-.L39:
+.L26:
 	mov	rdx, QWORD PTR -536[rbp]
 	lea	rax, -272[rbp]
 	mov	esi, 256
 	mov	rdi, rax
 	call	fgets@PLT
 	test	rax, rax
-	jne	.L40
+	jne	.L27
 	mov	rax, QWORD PTR -536[rbp]
 	mov	rdi, rax
 	call	pclose@PLT
-.L34:
+.L21:
 	mov	rax, QWORD PTR -8[rbp]
 	sub	rax, QWORD PTR fs:40
-	je	.L42
+	je	.L29
 	call	__stack_chk_fail@PLT
-.L42:
+.L29:
 	leave
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE13:
+.LFE10:
 	.size	cmd_ping, .-cmd_ping
 	.section	.rodata
 	.align 8
-.LC15:
+.LC12:
 	.string	"\r\033[KShutting down in %d seconds"
 	.text
 	.globl	cmd_exit
 	.type	cmd_exit, @function
 cmd_exit:
-.LFB14:
+.LFB11:
 	.cfi_startproc
 	endbr64
 	push	rbp
@@ -693,17 +477,17 @@ cmd_exit:
 	mov	DWORD PTR -20[rbp], edi
 	mov	QWORD PTR -32[rbp], rsi
 	mov	DWORD PTR -8[rbp], 5
-	jmp	.L44
-.L47:
+	jmp	.L31
+.L34:
 	mov	eax, DWORD PTR -8[rbp]
 	mov	esi, eax
-	lea	rax, .LC15[rip]
+	lea	rax, .LC12[rip]
 	mov	rdi, rax
 	mov	eax, 0
 	call	printf@PLT
 	mov	DWORD PTR -4[rbp], 0
-	jmp	.L45
-.L46:
+	jmp	.L32
+.L33:
 	mov	edi, 46
 	call	putchar@PLT
 	mov	rax, QWORD PTR stdout[rip]
@@ -712,70 +496,70 @@ cmd_exit:
 	mov	edi, 1
 	call	sleep@PLT
 	add	DWORD PTR -4[rbp], 1
-.L45:
+.L32:
 	cmp	DWORD PTR -4[rbp], 2
-	jle	.L46
+	jle	.L33
 	sub	DWORD PTR -8[rbp], 1
-.L44:
+.L31:
 	cmp	DWORD PTR -8[rbp], 0
-	jg	.L47
-	lea	rax, .LC8[rip]
+	jg	.L34
+	lea	rax, .LC5[rip]
 	mov	rdi, rax
 	mov	eax, 0
 	call	printf@PLT
 	mov	edi, 0
 	call	exit@PLT
 	.cfi_endproc
-.LFE14:
+.LFE11:
 	.size	cmd_exit, .-cmd_exit
 	.globl	commands
 	.section	.rodata
-.LC16:
+.LC13:
 	.string	"help"
 	.align 8
-.LC17:
+.LC14:
 	.string	"Displays list of Commands Available"
-.LC18:
+.LC15:
 	.string	"help | help <command>"
-.LC19:
+.LC16:
 	.string	"clear"
-.LC20:
+.LC17:
 	.string	"Clear the Terminal Screen"
-.LC21:
+.LC18:
 	.string	"Pings a host"
 	.align 8
-.LC22:
+.LC19:
 	.string	"ping <hostname> | e.g ping 127.0.0.1 or ping www.google.com"
-.LC23:
+.LC20:
 	.string	"exit"
-.LC24:
+.LC21:
 	.string	"Exits the Application"
 	.section	.data.rel.local,"aw"
 	.align 32
 	.type	commands, @object
 	.size	commands, 160
 commands:
-	.quad	.LC16
-	.quad	.LC17
-	.quad	.LC18
+	.quad	.LC13
+	.quad	.LC14
+	.quad	.LC15
 	.quad	cmd_help
 	.long	1
 	.zero	4
-	.quad	.LC19
-	.quad	.LC20
-	.quad	.LC19
+	.quad	.LC16
+	.quad	.LC17
+	.quad	.LC16
 	.quad	cmd_clear
 	.long	0
 	.zero	4
-	.quad	.LC9
-	.quad	.LC21
-	.quad	.LC22
+	.quad	.LC6
+	.quad	.LC18
+	.quad	.LC19
 	.quad	cmd_ping
 	.long	1
 	.zero	4
-	.quad	.LC23
-	.quad	.LC24
-	.quad	.LC23
+	.quad	.LC20
+	.quad	.LC21
+	.quad	.LC20
 	.quad	cmd_exit
 	.long	0
 	.zero	4
@@ -786,16 +570,16 @@ commands:
 	.size	commands_count, 4
 commands_count:
 	.long	4
-.LC25:
+.LC22:
 	.string	" \n"
 	.align 8
-.LC26:
+.LC23:
 	.string	"Unknown command: '%s'. Type 'help'.\n"
 	.text
 	.globl	handle
 	.type	handle, @function
 handle:
-.LFB15:
+.LFB12:
 	.cfi_startproc
 	endbr64
 	push	rbp
@@ -812,19 +596,19 @@ handle:
 	xor	eax, eax
 	mov	rax, QWORD PTR -88[rbp]
 	mov	rdi, rax
-	call	StringToLower
+	call	StringToLower@PLT
 	mov	edi, 80
 	call	malloc@PLT
 	mov	QWORD PTR -40[rbp], rax
 	mov	DWORD PTR -68[rbp], 0
 	mov	rax, QWORD PTR -88[rbp]
-	lea	rdx, .LC25[rip]
+	lea	rdx, .LC22[rip]
 	mov	rsi, rdx
 	mov	rdi, rax
 	call	strtok@PLT
 	mov	QWORD PTR -48[rbp], rax
-	jmp	.L49
-.L51:
+	jmp	.L36
+.L38:
 	mov	eax, DWORD PTR -68[rbp]
 	lea	edx, 1[rax]
 	mov	DWORD PTR -68[rbp], edx
@@ -836,31 +620,31 @@ handle:
 	mov	rdi, rax
 	call	strdup@PLT
 	mov	QWORD PTR [rbx], rax
-	lea	rax, .LC25[rip]
+	lea	rax, .LC22[rip]
 	mov	rsi, rax
 	mov	edi, 0
 	call	strtok@PLT
 	mov	QWORD PTR -48[rbp], rax
-.L49:
+.L36:
 	cmp	QWORD PTR -48[rbp], 0
-	je	.L50
+	je	.L37
 	cmp	DWORD PTR -68[rbp], 9
-	jle	.L51
-.L50:
+	jle	.L38
+.L37:
 	cmp	DWORD PTR -68[rbp], 0
-	jne	.L52
+	jne	.L39
 	mov	rax, QWORD PTR -40[rbp]
 	mov	rdi, rax
 	call	free@PLT
-	jmp	.L48
-.L52:
+	jmp	.L35
+.L39:
 	mov	rax, QWORD PTR -40[rbp]
 	mov	rax, QWORD PTR [rax]
 	mov	rdi, rax
 	call	get_command_index
 	mov	DWORD PTR -60[rbp], eax
 	cmp	DWORD PTR -60[rbp], -1
-	je	.L54
+	je	.L41
 	mov	eax, DWORD PTR -60[rbp]
 	movsx	rdx, eax
 	mov	rax, rdx
@@ -871,7 +655,7 @@ handle:
 	lea	rax, commands[rip+32]
 	mov	eax, DWORD PTR [rdx+rax]
 	test	eax, eax
-	je	.L55
+	je	.L42
 	mov	edi, 24
 	call	malloc@PLT
 	mov	QWORD PTR -32[rbp], rax
@@ -902,8 +686,8 @@ handle:
 	mov	rax, QWORD PTR -56[rbp]
 	mov	rdi, rax
 	call	pthread_detach@PLT
-	jmp	.L48
-.L55:
+	jmp	.L35
+.L42:
 	mov	eax, DWORD PTR -60[rbp]
 	movsx	rdx, eax
 	mov	rax, rdx
@@ -919,8 +703,8 @@ handle:
 	mov	edi, eax
 	call	rcx
 	mov	DWORD PTR -64[rbp], 0
-	jmp	.L57
-.L58:
+	jmp	.L44
+.L45:
 	mov	eax, DWORD PTR -64[rbp]
 	cdqe
 	lea	rdx, 0[0+rax*8]
@@ -930,34 +714,34 @@ handle:
 	mov	rdi, rax
 	call	free@PLT
 	add	DWORD PTR -64[rbp], 1
-.L57:
+.L44:
 	mov	eax, DWORD PTR -64[rbp]
 	cmp	eax, DWORD PTR -68[rbp]
-	jl	.L58
+	jl	.L45
 	mov	rax, QWORD PTR -40[rbp]
 	mov	rdi, rax
 	call	free@PLT
-	jmp	.L48
-.L54:
+	jmp	.L35
+.L41:
 	mov	rax, QWORD PTR -40[rbp]
 	mov	rax, QWORD PTR [rax]
 	mov	rsi, rax
-	lea	rax, .LC26[rip]
+	lea	rax, .LC23[rip]
 	mov	rdi, rax
 	mov	eax, 0
 	call	printf@PLT
-.L48:
+.L35:
 	mov	rax, QWORD PTR -24[rbp]
 	sub	rax, QWORD PTR fs:40
-	je	.L59
+	je	.L46
 	call	__stack_chk_fail@PLT
-.L59:
+.L46:
 	mov	rbx, QWORD PTR -8[rbp]
 	leave
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE15:
+.LFE12:
 	.size	handle, .-handle
 	.ident	"GCC: (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
 	.section	.note.GNU-stack,"",@progbits

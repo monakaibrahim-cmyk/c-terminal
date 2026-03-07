@@ -6,6 +6,7 @@ set(CMAKE_STANDARD 11)
 set(SOURCES
 	src/main.c
 	src/Command/Handler.c
+	src/Helper/Helper.c
 )
 
 include_directories(src)
@@ -14,7 +15,11 @@ add_executable(${PROJECT_NAME}
 	${SOURCES}
 )
 
-target_link_libraries(${PROJECT_NAME} pthread)
+target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+	${CMAKE_SOURCE_DIR}/src
+)
 
 set(ASM_OUTPUT_DIR "${CMAKE_SOURCE_DIR}/assembly")
 file(MAKE_DIRECTORY "${ASM_OUTPUT_DIR}")
@@ -37,7 +42,7 @@ foreach(SOURCE_FILE ${SOURCES})
 
 	add_custom_command(
         OUTPUT "${ASM_FILE}"
-        COMMAND ${CMAKE_C_COMPILER} -S -masm=intel -I${CMAKE_CURRENT_SOURCE_DIR} "${ABS_SOURCE}" -o "${ASM_FILE}"
+        COMMAND ${CMAKE_C_COMPILER} -S -masm=intel -I${CMAKE_CURRENT_SOURCE_DIR}/src "${ABS_SOURCE}" -o "${ASM_FILE}"
         DEPENDS "${ABS_SOURCE}"
         COMMENT "Generating assembly for ${REL_PATH} -> ${ASM_FILE}"
         VERBATIM
