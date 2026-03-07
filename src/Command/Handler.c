@@ -84,9 +84,67 @@ void cmd_clear(int argc, char** argv)
 	fflush(stdout);
 }
 
+void cmd_curl(int argc, char** argv)
+{
+	int idx = get_command_index(argv[0]);
+
+	if (argc < 2)
+	{
+		pthread_mutex_lock(&mutex);
+		printf("%s\n", commands[idx].usage);
+		pthread_mutex_unlock(&mutex);
+		return;
+	}
+	
+	char command[2048] = "curl ";
+
+	for (int i = 1; i < argc; i++)
+	{
+		if (strpbrk(argv[i], ";|&><$()"))
+		{
+			pthread_mutex_lock(&mutex);
+			tprintf("Error: Illegal character in arguments.");
+			pthread_mutex_unlock(&mutex);
+			return;
+		}
+
+		strncat(command, argv[i], sizeof(command) - strlen(command) - 1);
+		strncat(command, " ", sizeof(command) - strlen(command) - 1);
+	}
+
+	strncat(command, "2>&1", sizeof(command) - strlen(command) - 1);
+
+	FILE* pipe = popen(command, "r");
+
+	if (!pipe)
+	{
+		pthread_mutex_lock(&mutex);
+		tprintf("Error: Could not execute curl.");
+		pthread_mutex_unlock(&mutex);
+        return;
+	}
+
+	char buffer[512];
+
+	while (fgets(buffer, sizeof(buffer), pipe) != NULL)
+	{
+		if (buffer[0] == '*' || buffer[0] == '>' || buffer[0] == '<')
+		{
+			continue;
+		}
+
+		pthread_mutex_lock(&mutex);
+        tprintf("%s", buffer);
+		fflush(stdout);
+        pthread_mutex_unlock(&mutex);
+	}
+
+	pclose(pipe);
+}
+
 void cmd_ping(int argc, char** argv)
 {
-	int idx = get_command_index("ping");
+	int idx = get_command_index(argv[0]);
 
 	if (argc < 2)
 	{
@@ -130,6 +188,47 @@ void cmd_ping(int argc, char** argv)
 	pclose(fp);
 }
 
+void cmd_tree(int argc, char** argv)
+{
+	if (system("command -v tree > /dev/null 2>&1") == 0)
+	{
+		char command[512] = "tree ";
+
+		if (argc > 1)
+		{
+			strncat(command, argv[1], 500);
+		}
+		else
+		{
+			strncat(command, ".", 2);
+		}
+
+		FILE* pipe = popen(command, "r");
+
+		if (pipe)
+		{
+			char buffer[256];
+
+			while (fgets(buffer, sizeof(buffer), pipe))
+			{
+				printf("%s", buffer);
+			}
+
+			pclose(pipe);
+			return;
+		}
+	}
+
+	const char* path = (argc > 1) ? argv[1] : ".";
+	int files = 0;
+    int dirs = 0;
+
+	printf("%s\n", path);
+	list_dir(path, "", 1, &files, &dirs);
+	printf("\n%d directories, %d files\n", dirs, files);
+	fflush(stdout);
+}
+
 void cmd_exit(int argc, char** argv)
 {
 	int seconds = 5; // default countdown value
@@ -170,10 +269,24 @@ Command commands[] =
 		0
 	},
 	{
+		"curl",
+		"Sends HTTP requests",
+		"curl [options] <url> (e.g., curl -I https://google.com)",
+		cmd_curl,
+		1
+	},
+	{
 		"ping",
 		"Pings a host",
 		"ping <hostname> | e.g ping 127.0.0.1 or ping www.google.com",
 		cmd_ping,
+		1
+	},
+	{
+		"tree",
+		"List directory contents in a tree structure",
+		"tree [directory]",
+		cmd_tree,
 		1
 	},
 	{

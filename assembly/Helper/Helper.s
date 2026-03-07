@@ -10,7 +10,7 @@
 	.globl	print_with_timestamp
 	.type	print_with_timestamp, @function
 print_with_timestamp:
-.LFB0:
+.LFB6:
 	.cfi_startproc
 	endbr64
 	push	rbp
@@ -80,12 +80,12 @@ print_with_timestamp:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE0:
+.LFE6:
 	.size	print_with_timestamp, .-print_with_timestamp
 	.globl	StringToLower
 	.type	StringToLower, @function
 StringToLower:
-.LFB1:
+.LFB7:
 	.cfi_startproc
 	endbr64
 	push	rbp
@@ -117,7 +117,7 @@ StringToLower:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE1:
+.LFE7:
 	.size	StringToLower, .-StringToLower
 	.section	.rodata
 	.align 8
@@ -127,7 +127,7 @@ StringToLower:
 	.globl	is_safe_hostname
 	.type	is_safe_hostname, @function
 is_safe_hostname:
-.LFB2:
+.LFB8:
 	.cfi_startproc
 	endbr64
 	push	rbp
@@ -215,8 +215,184 @@ is_safe_hostname:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE2:
+.LFE8:
 	.size	is_safe_hostname, .-is_safe_hostname
+	.section	.rodata
+.LC3:
+	.string	"\342\224\224\342\224\200\342\224\200"
+.LC4:
+	.string	"\342\224\234\342\224\200\342\224\200"
+.LC5:
+	.string	"%s%s %s\n"
+.LC6:
+	.string	"%s/%s"
+.LC7:
+	.string	" "
+.LC8:
+	.string	"\342\224\202"
+.LC9:
+	.string	"%s%s   "
+	.text
+	.globl	list_dir
+	.type	list_dir, @function
+list_dir:
+.LFB9:
+	.cfi_startproc
+	endbr64
+	push	rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp
+	.cfi_def_cfa_register 6
+	sub	rsp, 4096
+	or	QWORD PTR [rsp], 0
+	sub	rsp, 4096
+	or	QWORD PTR [rsp], 0
+	sub	rsp, 1792
+	mov	QWORD PTR -9944[rbp], rdi
+	mov	QWORD PTR -9952[rbp], rsi
+	mov	DWORD PTR -9956[rbp], edx
+	mov	QWORD PTR -9968[rbp], rcx
+	mov	QWORD PTR -9976[rbp], r8
+	mov	rax, QWORD PTR fs:40
+	mov	QWORD PTR -8[rbp], rax
+	xor	eax, eax
+	mov	rax, QWORD PTR -9944[rbp]
+	mov	rdi, rax
+	call	opendir@PLT
+	mov	QWORD PTR -9912[rbp], rax
+	cmp	QWORD PTR -9912[rbp], 0
+	je	.L29
+	mov	DWORD PTR -9924[rbp], 0
+	jmp	.L18
+.L19:
+	mov	rax, QWORD PTR -9904[rbp]
+	movzx	eax, BYTE PTR 19[rax]
+	cmp	al, 46
+	je	.L18
+	mov	eax, DWORD PTR -9924[rbp]
+	lea	edx, 1[rax]
+	mov	DWORD PTR -9924[rbp], edx
+	cdqe
+	mov	rdx, QWORD PTR -9904[rbp]
+	mov	QWORD PTR -9744[rbp+rax*8], rdx
+.L18:
+	mov	rax, QWORD PTR -9912[rbp]
+	mov	rdi, rax
+	call	readdir@PLT
+	mov	QWORD PTR -9904[rbp], rax
+	cmp	QWORD PTR -9904[rbp], 0
+	jne	.L19
+	mov	DWORD PTR -9920[rbp], 0
+	jmp	.L20
+.L27:
+	mov	eax, DWORD PTR -9924[rbp]
+	sub	eax, 1
+	cmp	DWORD PTR -9920[rbp], eax
+	sete	al
+	movzx	eax, al
+	mov	DWORD PTR -9916[rbp], eax
+	mov	eax, DWORD PTR -9920[rbp]
+	cdqe
+	mov	rax, QWORD PTR -9744[rbp+rax*8]
+	add	rax, 19
+	mov	QWORD PTR -9896[rbp], rax
+	cmp	DWORD PTR -9916[rbp], 0
+	je	.L21
+	lea	rax, .LC3[rip]
+	jmp	.L22
+.L21:
+	lea	rax, .LC4[rip]
+.L22:
+	mov	rdx, QWORD PTR -9896[rbp]
+	mov	rsi, QWORD PTR -9952[rbp]
+	mov	rcx, rdx
+	mov	rdx, rax
+	lea	rax, .LC5[rip]
+	mov	rdi, rax
+	mov	eax, 0
+	call	printf@PLT
+	mov	rcx, QWORD PTR -9896[rbp]
+	mov	rdx, QWORD PTR -9944[rbp]
+	lea	rax, -1040[rbp]
+	mov	r8, rcx
+	mov	rcx, rdx
+	lea	rdx, .LC6[rip]
+	mov	esi, 1024
+	mov	rdi, rax
+	mov	eax, 0
+	call	snprintf@PLT
+	lea	rdx, -9888[rbp]
+	lea	rax, -1040[rbp]
+	mov	rsi, rdx
+	mov	rdi, rax
+	call	stat@PLT
+	test	eax, eax
+	jne	.L23
+	mov	eax, DWORD PTR -9864[rbp]
+	and	eax, 61440
+	cmp	eax, 16384
+	jne	.L24
+	mov	rax, QWORD PTR -9976[rbp]
+	mov	eax, DWORD PTR [rax]
+	lea	edx, 1[rax]
+	mov	rax, QWORD PTR -9976[rbp]
+	mov	DWORD PTR [rax], edx
+	cmp	DWORD PTR -9916[rbp], 0
+	je	.L25
+	lea	rax, .LC7[rip]
+	jmp	.L26
+.L25:
+	lea	rax, .LC8[rip]
+.L26:
+	mov	rdx, QWORD PTR -9952[rbp]
+	lea	rdi, -1552[rbp]
+	mov	r8, rax
+	mov	rcx, rdx
+	lea	rax, .LC9[rip]
+	mov	rdx, rax
+	mov	esi, 512
+	mov	eax, 0
+	call	snprintf@PLT
+	mov	rdi, QWORD PTR -9976[rbp]
+	mov	rcx, QWORD PTR -9968[rbp]
+	mov	edx, DWORD PTR -9916[rbp]
+	lea	rsi, -1552[rbp]
+	lea	rax, -1040[rbp]
+	mov	r8, rdi
+	mov	rdi, rax
+	call	list_dir
+	jmp	.L23
+.L24:
+	mov	rax, QWORD PTR -9968[rbp]
+	mov	eax, DWORD PTR [rax]
+	lea	edx, 1[rax]
+	mov	rax, QWORD PTR -9968[rbp]
+	mov	DWORD PTR [rax], edx
+.L23:
+	add	DWORD PTR -9920[rbp], 1
+.L20:
+	mov	eax, DWORD PTR -9920[rbp]
+	cmp	eax, DWORD PTR -9924[rbp]
+	jl	.L27
+	mov	rax, QWORD PTR -9912[rbp]
+	mov	rdi, rax
+	call	closedir@PLT
+	jmp	.L14
+.L29:
+	nop
+.L14:
+	mov	rax, QWORD PTR -8[rbp]
+	sub	rax, QWORD PTR fs:40
+	je	.L28
+	call	__stack_chk_fail@PLT
+.L28:
+	leave
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE9:
+	.size	list_dir, .-list_dir
 	.ident	"GCC: (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
 	.section	.note.GNU-stack,"",@progbits
 	.section	.note.gnu.property,"a"

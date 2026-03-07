@@ -1,7 +1,11 @@
 #include <ctype.h>
+#include <dirent.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "Helper.h"
 
@@ -49,4 +53,56 @@ int is_safe_hostname(const char* str)
 	}
 
 	return 1;
+}
+
+void list_dir(const char* base_path, const char* prefix, int is_last, int* file_count, int* dir_count)
+{
+    DIR* dir = opendir(base_path);
+
+    if (!dir)
+    {
+        return;
+    }
+
+    struct dirent* entry;
+    struct dirent* entries[1024];
+    int count = 0;
+
+    while ((entry = readdir(dir)) != NULL)
+    {
+        if (entry->d_name[0] != '.')
+        {
+            entries[count++] = entry;
+        }
+    }
+
+    for (int i = 0; i < count; i++)
+    {
+        int last_child = (i == count - 1);
+        char* name = entries[i]->d_name;
+        char path[1024];
+        struct stat st;
+
+        printf("%s%s %s\n", prefix, last_child ? "└──" : "├──", name);
+
+        snprintf(path, sizeof(path), "%s/%s", base_path, name);
+
+        if (stat(path, &st) == 0)
+        {
+            if (S_ISDIR(st.st_mode))
+            {
+                (*dir_count)++;
+                char new_prefix[512];
+
+                snprintf(new_prefix, sizeof(new_prefix), "%s%s   ", prefix, last_child ? " " : "│");
+                list_dir(path, new_prefix, last_child, file_count, dir_count);
+            }
+            else
+            {
+                (*file_count)++;
+            }
+        }
+    }
+
+    closedir(dir);
 }
