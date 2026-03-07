@@ -42,11 +42,18 @@ foreach(SOURCE_FILE ${SOURCES})
 	get_filename_component(ASM_DIR ${ASM_FILE} DIRECTORY)
     file(MAKE_DIRECTORY ${ASM_DIR})
 
+	get_property(INCLUDE_DIRS TARGET Terminal PROPERTY INCLUDE_DIRECTORIES)
+
+	set(INCLUDE_FLAGS "")
+	foreach(DIR ${INCLUDE_DIRS})
+		list(APPEND INCLUDE_FLAGS "/I\"${DIR}\"")
+	endforeach()
+
 	if(MSVC)
 		set(ASM_FLAGS "/FAs") 
 		add_custom_command(
 			OUTPUT "${ASM_FILE}"
-			COMMAND ${CMAKE_C_COMPILER} ${ASM_FLAGS} /Fa"${ASM_FILE}" "${ABS_SOURCE}"
+			COMMAND ${CMAKE_C_COMPILER} /FAs /Fa"${ASM_FILE}" ${INCLUDE_FLAGS} "${ABS_SOURCE}"
 			DEPENDS "${ABS_SOURCE}"
 			COMMENT "Generating MSVC assembly for ${REL_PATH}"
 			VERBATIM
