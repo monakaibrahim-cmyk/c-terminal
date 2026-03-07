@@ -42,13 +42,24 @@ foreach(SOURCE_FILE ${SOURCES})
 	get_filename_component(ASM_DIR ${ASM_FILE} DIRECTORY)
     file(MAKE_DIRECTORY ${ASM_DIR})
 
-	add_custom_command(
-        OUTPUT "${ASM_FILE}"
-        COMMAND ${CMAKE_C_COMPILER} -S -masm=intel -I${CMAKE_CURRENT_SOURCE_DIR}/src "${ABS_SOURCE}" -o "${ASM_FILE}"
-        DEPENDS "${ABS_SOURCE}"
-        COMMENT "Generating assembly for ${REL_PATH} -> ${ASM_FILE}"
-        VERBATIM
-    )
+	if(MSVC)
+		set(ASM_FLAGS "/FAs") 
+		add_custom_command(
+			OUTPUT "${ASM_FILE}"
+			COMMAND ${CMAKE_C_COMPILER} ${ASM_FLAGS} /Fa"${ASM_FILE}" "${ABS_SOURCE}"
+			DEPENDS "${ABS_SOURCE}"
+			COMMENT "Generating MSVC assembly for ${REL_PATH}"
+			VERBATIM
+		)
+	else()
+		add_custom_command(
+			OUTPUT "${ASM_FILE}"
+			COMMAND ${CMAKE_C_COMPILER} -S -masm=intel -I${CMAKE_CURRENT_SOURCE_DIR}/src "${ABS_SOURCE}" -o "${ASM_FILE}"
+			DEPENDS "${ABS_SOURCE}"
+			COMMENT "Generating assembly for ${REL_PATH} -> ${ASM_FILE}"
+			VERBATIM
+		)
+	endif()
 	list(APPEND ASM_FILES "${ASM_FILE}")
 endforeach()
 
