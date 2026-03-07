@@ -8,14 +8,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -y build-essential cmake
 
     - name: Configure CMake
       run: cmake -B build
@@ -27,11 +24,14 @@ jobs:
       run: cmake --build build --target asm
 
     - name: Run Basic Tests
+      shell: powershell
       run: |
-        # This checks if the executable was actually created
-        if [ -f ./build/Terminal ]; then
-          echo "Build successful!"
+        if (Test-Path "./build/Terminal.exe")
+        {
+          Write-Host "Build successful!"
+        }
         else
-          echo "Executable not found!"
+        {
+          Write-Host "Executable not found!"
           exit 1
-        fi
+        }
