@@ -23,7 +23,7 @@ jobs:
     - name: Run Basic Tests
       shell: powershell
       run: |
-        if (Test-Path "./build/Terminal.exe")
+        if (Test-Path "./build/debug/Terminal.exe")
         {
           Write-Host "Build successful!"
         }
