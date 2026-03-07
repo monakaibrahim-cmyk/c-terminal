@@ -1,15 +1,14 @@
-#include <pthread.h>
-#include <stdatomic.h>
+#include <windows.h>
+#include <process.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "Handler.h"
 #include "Helper/Helper.h"
 
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 atomic_int is_busy = 0;
+CRITICAL_SECTION cs;
 
 int get_command_index(const char* name)
 {
@@ -24,7 +23,7 @@ int get_command_index(const char* name)
 	return -1; // Not Found
 }
 
-void* wrapper(void* args)
+unsigned __stdcall wrapper(void* args)
 {
 	Thread* t = (Thread*)args;
 	is_busy = 1;
@@ -41,151 +40,12 @@ void* wrapper(void* args)
 
 	is_busy = 0;
 
-	return NULL;
-}
-
-void cmd_help(int argc, char** argv)
-{
-	pthread_mutex_lock(&mutex);
-
-	if (argc > 1)
-	{
-		for (int i = 0; i < commands_count; i++)
-		{
-			if (strcmp(argv[1], commands[i].name) == 0)
-			{
-				printf("Description: %s\n", commands[i].desc);
-                printf("Usage:       %s\n", commands[i].usage);
-				pthread_mutex_unlock(&mutex);
-				return;
-			}
-		}
-
-		printf("Unknown Command: '%s'\n", argv[1]);
-	}
-	else
-	{
-		printf("Available Commands:\n");
-
-		for (int i = 0; i < commands_count; i++)
-		{
-			printf("  %-10s - %s\n", commands[i].name, commands[i].desc);
-		}
-	}
-
-	fflush(stdout);
-
-	pthread_mutex_unlock(&mutex);
+	return 0;
 }
 
 void cmd_clear(int argc, char** argv)
 {
-	printf("\033[H\033[J");
-	fflush(stdout);
-}
-
-void cmd_curl(int argc, char** argv)
-{
-	int idx = get_command_index(argv[0]);
-
-	if (argc < 2)
-	{
-		pthread_mutex_lock(&mutex);
-		printf("%s\n", commands[idx].usage);
-		pthread_mutex_unlock(&mutex);
-		return;
-	}
-	
-	char command[2048] = "curl ";
-
-	for (int i = 1; i < argc; i++)
-	{
-		if (strpbrk(argv[i], ";|&><$()"))
-		{
-			pthread_mutex_lock(&mutex);
-			tprintf("Error: Illegal character in arguments.");
-			pthread_mutex_unlock(&mutex);
-			return;
-		}
-
-		strncat(command, argv[i], sizeof(command) - strlen(command) - 1);
-		strncat(command, " ", sizeof(command) - strlen(command) - 1);
-	}
-
-	strncat(command, "2>&1", sizeof(command) - strlen(command) - 1);
-
-	FILE* pipe = popen(command, "r");
-
-	if (!pipe)
-	{
-		pthread_mutex_lock(&mutex);
-		tprintf("Error: Could not execute curl.");
-		pthread_mutex_unlock(&mutex);
-        return;
-	}
-
-	char buffer[512];
-
-	while (fgets(buffer, sizeof(buffer), pipe) != NULL)
-	{
-		if (buffer[0] == '*' || buffer[0] == '>' || buffer[0] == '<')
-		{
-			continue;
-		}
-
-		pthread_mutex_lock(&mutex);
-        tprintf("%s", buffer);
-		fflush(stdout);
-        pthread_mutex_unlock(&mutex);
-	}
-
-	pclose(pipe);
-}
-
-void cmd_ping(int argc, char** argv)
-{
-	int idx = get_command_index(argv[0]);
-
-	if (argc < 2)
-	{
-		pthread_mutex_lock(&mutex);
-		printf("%s\n", commands[idx].usage);
-		pthread_mutex_unlock(&mutex);
-		return;
-	}
-
-	if (!is_safe_hostname(argv[1]))
-	{
-		pthread_mutex_lock(&mutex);
-        printf("Error: Invalid characters in hostname.\n");
-        pthread_mutex_unlock(&mutex);
-        return;
-	}
-
-	char command[256];
-	snprintf(command, sizeof(command), "ping -c 4 %s", argv[1]);
-
-	FILE* fp = popen(command, "r");
-
-	if (fp == NULL)
-	{
-		pthread_mutex_lock(&mutex);
-        printf("Failed to run ping.\n");
-        pthread_mutex_unlock(&mutex);
-        return;
-	}
-
-	char line[256];
-	
-	while (fgets(line, sizeof(line), fp) != NULL)
-	{
-		pthread_mutex_lock(&mutex);
-		tprintf("[%s] %s", argv[1], line);
-		fflush(stdout);
-		pthread_mutex_unlock(&mutex);
-	}
-
-	pclose(fp);
+	system("cls");
 }
 
 void cmd_tree(int argc, char** argv)
@@ -241,46 +101,24 @@ void cmd_exit(int argc, char** argv)
 		{
 			printf(".");
 			fflush(stdout);
-			sleep(1);
+			Sleep(1000);
 		}
 
 		seconds--;
 	}
 
-	printf("\033[H\033[J");
-
-	exit(0);
+	system("cls");
+	exit(EXIT_SUCCESS);
 }
 
 Command commands[] =
 {
-	{
-		"help",
-		"Displays list of Commands Available",
-		"help | help <command>",
-		cmd_help,
-		1
-	},
 	{
 		"clear",
 		"Clear the Terminal Screen",
 		"clear",
 		cmd_clear,
 		0
-	},
-	{
-		"curl",
-		"Sends HTTP requests",
-		"curl [options] <url> (e.g., curl -I https://google.com)",
-		cmd_curl,
-		1
-	},
-	{
-		"ping",
-		"Pings a host",
-		"ping <hostname> | e.g ping 127.0.0.1 or ping www.google.com",
-		cmd_ping,
-		1
 	},
 	{
 		"tree",
@@ -331,9 +169,7 @@ void handle(char* input)
             t->argc = argc;
             t->argv = argv;
 
-			pthread_t thread;
-            pthread_create(&thread, NULL, wrapper, t);
-            pthread_detach(thread);
+			_beginthreadex(NULL, 0, wrapper, t, 0, NULL);
 		}
 		else
 		{
@@ -350,5 +186,5 @@ void handle(char* input)
 		return;
 	}
 
-	printf("Unknown command: '%s'. Type 'help'.\n", argv[0]);
+	printf("Unknown command: '%s'.\n", argv[0]);
 }

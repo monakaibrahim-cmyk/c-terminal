@@ -1,33 +1,30 @@
+#include <windows.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
+
 #include "Command/Handler.h"
+#include "Helper/Helper.h"
 
 // Helper
 void msleep(long milliseconds)
 {
-	struct timespec ts;
-    ts.tv_sec = milliseconds / 1000;
-    ts.tv_nsec = (milliseconds % 1000) * 1000000L;
-
-	while (nanosleep(&ts, &ts) == -1)
-	{
-        continue;
-    }
+	Sleep((DWORD)milliseconds);
 }
 
 int main(int argc, char* argv[])
 {
+	SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+	
 	char buffer[256];
 
-	printf("Terminal App v1.0. Type 'help' for commands.\n");
+	printf("Terminal App v1.0.\n");
 
 	while(1)
 	{
 		while (atomic_load(&is_busy))
 		{
-			struct timespec ts = {0, 100000000L};
-			nanosleep(&ts, &ts);
+			msleep(100);
 		}
 
 		printf("[CMD] >> ");
@@ -39,7 +36,15 @@ int main(int argc, char* argv[])
 		}
 
 		// Remove line
-		printf("\033[1A\033[2K");
+		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		CONSOLE_SCREEN_BUFFER_INFO csbi;
+		GetConsoleScreenBufferInfo(hConsole, &csbi);
+		
+		COORD coord = { 0, csbi.dwCursorPosition.Y };
+		DWORD written;
+		FillConsoleOutputCharacter(hConsole, ' ', csbi.dwSize.X, coord, &written);
+		SetConsoleCursorPosition(hConsole, coord);
+
 		fflush(stdout);
 
 		buffer[strcspn(buffer, "\n")] = 0;
@@ -51,5 +56,5 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }
