@@ -1,10 +1,11 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <ctype.h>
 #include <pthread.h>
+#include <stdarg.h>
 #include <stdatomic.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "Handler.h"
 
@@ -39,6 +40,38 @@ int is_safe_hostname(const char* str)
 	return 1;
 }
 
+void print_with_timestamp(const char* format, ...)
+{
+	time_t rawtime;
+    struct tm *timeinfo;
+    char buffer[20];
+
+	time(&rawtime);
+    timeinfo = localtime(&rawtime);
+
+	strftime(buffer, sizeof(buffer), "[%H:%M:%S] ", timeinfo);
+
+	printf("%s", buffer);
+
+	va_list args;
+    va_start(args, format);
+	vprintf(format, args);
+	va_end(args);
+}
+
+int get_command_index(const char* name)
+{
+	for (int i = 0; i < commands_count; i++)
+	{
+		if (strcmp(commands[i].name, name) == 0)
+		{
+			return i; // Found index number
+		}
+	}
+
+	return -1; // Not Found
+}
+
 //////////////////////////////////////
 
 void* wrapper(void* args)
@@ -71,7 +104,6 @@ void cmd_help(int argc, char** argv)
 		{
 			if (strcmp(argv[1], commands[i].name) == 0)
 			{
-				// printf("Usage for '%s': %s\n", commands[i].name, commands[i].usage);
 				printf("Description: %s\n", commands[i].desc);
                 printf("Usage:       %s\n", commands[i].usage);
 				pthread_mutex_unlock(&mutex);
@@ -104,10 +136,12 @@ void cmd_clear(int argc, char** argv)
 
 void cmd_ping(int argc, char** argv)
 {
+	int idx = get_command_index("ping");
+
 	if (argc < 2)
 	{
 		pthread_mutex_lock(&mutex);
-		printf("Usage: ping <hostname>\n");
+		printf("%s\n", commands[idx].usage);
 		pthread_mutex_unlock(&mutex);
 		return;
 	}
@@ -138,7 +172,7 @@ void cmd_ping(int argc, char** argv)
 	while (fgets(line, sizeof(line), fp) != NULL)
 	{
 		pthread_mutex_lock(&mutex);
-        printf("[%s] %s", argv[1], line);
+		tprintf("[%s] %s", argv[1], line);
 		fflush(stdout);
 		pthread_mutex_unlock(&mutex);
 	}
@@ -201,11 +235,12 @@ Command commands[] =
 	}
 };
 
-int commands_count = sizeof(commands) / sizeof(Command);
+const int commands_count = sizeof(commands) / sizeof(Command);
 
 void handle(char* input)
 {
 	StringToLower(input);
+
 	char** argv = malloc(sizeof(char*) * 10);
 	int argc = 0;
 	char* token = strtok(input, " \n");
@@ -222,37 +257,35 @@ void handle(char* input)
 		return;
 	}
 
-	for (int i = 0; i < commands_count; i++)
+	int idx = get_command_index(argv[0]);
+
+	if (idx != -1)
 	{
-		if (strcmp(argv[0], commands[i].name) == 0)
+		if (commands[idx].is_threaded)
 		{
-			if (commands[i].is_threaded)
-			{
-				Thread* t = malloc(sizeof(Thread));
-				t->func = commands[i].func;
-				t->argc = argc;
-				t->argv = argv;
-				
-				pthread_t thread;
-				pthread_create(&thread, NULL, wrapper, t);
-				pthread_detach(thread);
-			}
-			else
-			{
-				commands[i].func(argc, argv);
+			Thread* t = malloc(sizeof(Thread));
+            t->func = commands[idx].func;
+            t->argc = argc;
+            t->argv = argv;
 
-				for (int i = 0; i < argc; i++)
-				{
-					free(argv[i]);
-				}
-
-				free(argv);
-			}
-
-			return;
+			pthread_t thread;
+            pthread_create(&thread, NULL, wrapper, t);
+            pthread_detach(thread);
 		}
+		else
+		{
+			commands[idx].func(argc, argv);
+
+			for (int i = 0; i < argc; i++)
+			{
+				free(argv[i]);
+			}
+
+			free(argv);
+		}
+
+		return;
 	}
 
 	printf("Unknown command: '%s'. Type 'help'.\n", argv[0]);
-	
 }
