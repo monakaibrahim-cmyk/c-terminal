@@ -1,7 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
 project(Terminal C)
 
-set(CMAKE_STANDARD 11)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
+if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /std:c11)
+endif()
 
 set(SOURCES
 	src/main.c

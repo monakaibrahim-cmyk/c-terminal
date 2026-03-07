@@ -1,7 +1,13 @@
 #ifndef COMMAND_HANDLER_H
 #define COMMAND_HANDLER_H
 
-#include <stdatomic.h>
+#ifdef _MSC_VER
+    #include <windows.h>
+    #define atomic_int LONG
+    #define atomic_load(x) InterlockedExchangeAdd(x, 0)
+#else
+    #include <stdatomic.h>
+#endif
 
 typedef void (*command_func)(int argc, char** argv);
 
