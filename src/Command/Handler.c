@@ -4,10 +4,12 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <pthread.h>
+#include <stdatomic.h>
 
 #include "Handler.h"
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+atomic_int is_busy = 0;
 
 // Helper
 void StringToLower(char* str)
@@ -18,9 +20,32 @@ void StringToLower(char* str)
 	}
 }
 
+int is_safe_hostname(const char* str)
+{
+	if (str == NULL || strlen(str) == 0)
+	{
+		return 0;
+	}
+
+	for (int i = 0; str[i] != '\0'; i++)
+	{
+		if (!isalnum((unsigned char)str[i]) && str[i] != '.' && str[i] != '-')
+		{
+			printf("DEBUG: Rejected char at index %d: '%c' (ASCII %d)\n", i, str[i], str[i]);
+			return 0;
+		}
+	}
+
+	return 1;
+}
+
+//////////////////////////////////////
+
 void* wrapper(void* args)
 {
 	Thread* t = (Thread*)args;
+	is_busy = 1;
+
 	t->func(t->argc, t->argv);
 
 	for (int i = 0; i < t->argc; i++)
@@ -30,6 +55,8 @@ void* wrapper(void* args)
 
 	free(t->argv);
 	free(t);
+
+	is_busy = 0;
 
 	return NULL;
 }
@@ -44,7 +71,9 @@ void cmd_help(int argc, char** argv)
 		{
 			if (strcmp(argv[1], commands[i].name) == 0)
 			{
-				printf("Usage for '%s': %s\n", commands[i].name, commands[i].desc);
+				// printf("Usage for '%s': %s\n", commands[i].name, commands[i].usage);
+				printf("Description: %s\n", commands[i].desc);
+                printf("Usage:       %s\n", commands[i].usage);
 				pthread_mutex_unlock(&mutex);
 				return;
 			}
@@ -73,13 +102,57 @@ void cmd_clear(int argc, char** argv)
 	fflush(stdout);
 }
 
+void cmd_ping(int argc, char** argv)
+{
+	if (argc < 2)
+	{
+		pthread_mutex_lock(&mutex);
+		printf("Usage: ping <hostname>\n");
+		pthread_mutex_unlock(&mutex);
+		return;
+	}
+
+	if (!is_safe_hostname(argv[1]))
+	{
+		pthread_mutex_lock(&mutex);
+        printf("Error: Invalid characters in hostname.\n");
+        pthread_mutex_unlock(&mutex);
+        return;
+	}
+
+	char command[256];
+	snprintf(command, sizeof(command), "ping -c 4 %s", argv[1]);
+
+	FILE* fp = popen(command, "r");
+
+	if (fp == NULL)
+	{
+		pthread_mutex_lock(&mutex);
+        printf("Failed to run ping.\n");
+        pthread_mutex_unlock(&mutex);
+        return;
+	}
+
+	char line[256];
+	
+	while (fgets(line, sizeof(line), fp) != NULL)
+	{
+		pthread_mutex_lock(&mutex);
+        printf("[%s] %s", argv[1], line);
+		fflush(stdout);
+		pthread_mutex_unlock(&mutex);
+	}
+
+	pclose(fp);
+}
+
 void cmd_exit(int argc, char** argv)
 {
 	int seconds = 5; // default countdown value
 
 	while (seconds > 0)
 	{
-		printf("\r\033[KShuttinig down in %d seconds", seconds);
+		printf("\r\033[KShutting down in %d seconds", seconds);
 
 		for (int j = 0; j < 3; j++)
 		{
@@ -101,18 +174,28 @@ Command commands[] =
 	{
 		"help",
 		"Displays list of Commands Available",
+		"help | help <command>",
 		cmd_help,
 		1
 	},
 	{
 		"clear",
 		"Clear the Terminal Screen",
+		"clear",
 		cmd_clear,
 		0
 	},
 	{
+		"ping",
+		"Pings a host",
+		"ping <hostname> | e.g ping 127.0.0.1 or ping www.google.com",
+		cmd_ping,
+		1
+	},
+	{
 		"exit",
 		"Exits the Application",
+		"exit",
 		cmd_exit,
 		0
 	}
