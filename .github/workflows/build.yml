@@ -38,4 +38,4 @@ jobs:
       with:
         name: Compiled
         path: |
-          build/**/*.exe
+          build/debug/*.exe
