@@ -20,9 +20,6 @@ jobs:
     - name: Build project
       run: cmake --build build
 
-    - name: Convert to assembly
-      run: cmake --build build --target asm
-
     - name: Run Basic Tests
       shell: powershell
       run: |
