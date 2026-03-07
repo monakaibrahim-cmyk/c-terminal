@@ -50,35 +50,6 @@ void cmd_clear(int argc, char** argv)
 
 void cmd_tree(int argc, char** argv)
 {
-	if (system("command -v tree > /dev/null 2>&1") == 0)
-	{
-		char command[512] = "tree ";
-
-		if (argc > 1)
-		{
-			strncat(command, argv[1], 500);
-		}
-		else
-		{
-			strncat(command, ".", 2);
-		}
-
-		FILE* pipe = popen(command, "r");
-
-		if (pipe)
-		{
-			char buffer[256];
-
-			while (fgets(buffer, sizeof(buffer), pipe))
-			{
-				printf("%s", buffer);
-			}
-
-			pclose(pipe);
-			return;
-		}
-	}
-
 	const char* path = (argc > 1) ? argv[1] : ".";
 	int files = 0;
     int dirs = 0;

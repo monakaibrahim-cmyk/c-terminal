@@ -172,20 +172,13 @@ cmd_clear:
 	ret
 	.seh_endproc
 	.section .rdata,"dr"
-	.align 8
 .LC1:
-	.ascii "command -v tree > /dev/null 2>&1\0"
-.LC2:
-	.ascii "r\0"
-.LC3:
-	.ascii "%s\0"
-.LC4:
 	.ascii ".\0"
-.LC5:
+.LC2:
 	.ascii "%s\12\0"
-.LC6:
+.LC3:
 	.ascii "\0"
-.LC7:
+.LC4:
 	.ascii "\12%d directories, %d files\12\0"
 	.text
 	.globl	cmd_tree
@@ -194,108 +187,43 @@ cmd_clear:
 cmd_tree:
 	push	rbp
 	.seh_pushreg	rbp
-	push	rdi
-	.seh_pushreg	rdi
-	sub	rsp, 856
-	.seh_stackalloc	856
-	lea	rbp, 128[rsp]
-	.seh_setframe	rbp, 128
+	mov	rbp, rsp
+	.seh_setframe	rbp, 0
+	sub	rsp, 64
+	.seh_stackalloc	64
 	.seh_endprologue
-	mov	DWORD PTR 752[rbp], ecx
-	mov	QWORD PTR 760[rbp], rdx
-	lea	rax, .LC1[rip]
-	mov	rcx, rax
-	call	system
-	test	eax, eax
-	jne	.L14
-	movabs	rax, 139140100724
-	mov	edx, 0
-	mov	QWORD PTR 176[rbp], rax
-	mov	QWORD PTR 184[rbp], rdx
-	lea	rdx, 192[rbp]
-	mov	eax, 0
-	mov	ecx, 62
-	mov	rdi, rdx
-	rep stosq
-	cmp	DWORD PTR 752[rbp], 1
-	jle	.L15
-	mov	rax, QWORD PTR 760[rbp]
-	add	rax, 8
-	mov	rdx, QWORD PTR [rax]
-	lea	rax, 176[rbp]
-	mov	r8d, 500
-	mov	rcx, rax
-	call	strncat
-	jmp	.L16
-.L15:
-	lea	rax, 176[rbp]
-	mov	rcx, rax
-	call	strlen
-	mov	rdx, rax
-	lea	rax, 176[rbp]
-	add	rax, rdx
-	mov	WORD PTR [rax], 46
-.L16:
-	lea	rax, 176[rbp]
-	lea	rdx, .LC2[rip]
-	mov	rcx, rax
-	mov	rax, QWORD PTR __imp__popen[rip]
-	call	rax
-	mov	QWORD PTR 712[rbp], rax
-	cmp	QWORD PTR 712[rbp], 0
-	je	.L14
-	jmp	.L18
-.L19:
-	lea	rax, -80[rbp]
-	mov	rdx, rax
-	lea	rax, .LC3[rip]
-	mov	rcx, rax
-	call	printf
-.L18:
-	mov	rdx, QWORD PTR 712[rbp]
-	lea	rax, -80[rbp]
-	mov	r8, rdx
-	mov	edx, 256
-	mov	rcx, rax
-	call	fgets
-	test	rax, rax
-	jne	.L19
-	mov	rax, QWORD PTR 712[rbp]
-	mov	rcx, rax
-	mov	rax, QWORD PTR __imp__pclose[rip]
-	call	rax
-	jmp	.L13
-.L14:
-	cmp	DWORD PTR 752[rbp], 1
-	jle	.L21
-	mov	rax, QWORD PTR 760[rbp]
+	mov	DWORD PTR 16[rbp], ecx
+	mov	QWORD PTR 24[rbp], rdx
+	cmp	DWORD PTR 16[rbp], 1
+	jle	.L14
+	mov	rax, QWORD PTR 24[rbp]
 	mov	rax, QWORD PTR 8[rax]
-	jmp	.L22
-.L21:
-	lea	rax, .LC4[rip]
-.L22:
-	mov	QWORD PTR 704[rbp], rax
-	mov	DWORD PTR 700[rbp], 0
-	mov	DWORD PTR 696[rbp], 0
-	mov	rax, QWORD PTR 704[rbp]
+	jmp	.L15
+.L14:
+	lea	rax, .LC1[rip]
+.L15:
+	mov	QWORD PTR -8[rbp], rax
+	mov	DWORD PTR -12[rbp], 0
+	mov	DWORD PTR -16[rbp], 0
+	mov	rax, QWORD PTR -8[rbp]
 	mov	rdx, rax
-	lea	rax, .LC5[rip]
+	lea	rax, .LC2[rip]
 	mov	rcx, rax
 	call	printf
-	lea	rcx, 700[rbp]
-	mov	rax, QWORD PTR 704[rbp]
-	lea	rdx, 696[rbp]
+	lea	rcx, -12[rbp]
+	mov	rax, QWORD PTR -8[rbp]
+	lea	rdx, -16[rbp]
 	mov	QWORD PTR 32[rsp], rdx
 	mov	r9, rcx
 	mov	r8d, 1
-	lea	rdx, .LC6[rip]
+	lea	rdx, .LC3[rip]
 	mov	rcx, rax
 	call	list_dir
-	mov	edx, DWORD PTR 700[rbp]
-	mov	eax, DWORD PTR 696[rbp]
+	mov	edx, DWORD PTR -12[rbp]
+	mov	eax, DWORD PTR -16[rbp]
 	mov	r8d, edx
 	mov	edx, eax
-	lea	rax, .LC7[rip]
+	lea	rax, .LC4[rip]
 	mov	rcx, rax
 	call	printf
 	mov	ecx, 1
@@ -304,15 +232,13 @@ cmd_tree:
 	mov	rcx, rax
 	call	fflush
 	nop
-.L13:
-	add	rsp, 856
-	pop	rdi
+	add	rsp, 64
 	pop	rbp
 	ret
 	.seh_endproc
 	.section .rdata,"dr"
 	.align 8
-.LC8:
+.LC5:
 	.ascii "\15\33[KShutting down in %d seconds\0"
 	.text
 	.globl	cmd_exit
@@ -329,17 +255,17 @@ cmd_exit:
 	mov	DWORD PTR 16[rbp], ecx
 	mov	QWORD PTR 24[rbp], rdx
 	mov	DWORD PTR -4[rbp], 5
-	jmp	.L24
-.L27:
+	jmp	.L17
+.L20:
 	mov	eax, DWORD PTR -4[rbp]
 	mov	edx, eax
-	lea	rax, .LC8[rip]
+	lea	rax, .LC5[rip]
 	mov	rcx, rax
 	call	printf
 	mov	DWORD PTR -8[rbp], 0
-	jmp	.L25
-.L26:
-	lea	rax, .LC4[rip]
+	jmp	.L18
+.L19:
+	lea	rax, .LC1[rip]
 	mov	rcx, rax
 	call	printf
 	mov	ecx, 1
@@ -351,13 +277,13 @@ cmd_exit:
 	mov	rax, QWORD PTR __imp_Sleep[rip]
 	call	rax
 	add	DWORD PTR -8[rbp], 1
-.L25:
+.L18:
 	cmp	DWORD PTR -8[rbp], 2
-	jle	.L26
+	jle	.L19
 	sub	DWORD PTR -4[rbp], 1
-.L24:
+.L17:
 	cmp	DWORD PTR -4[rbp], 0
-	jg	.L27
+	jg	.L20
 	lea	rax, .LC0[rip]
 	mov	rcx, rax
 	call	system
@@ -367,39 +293,39 @@ cmd_exit:
 	.seh_endproc
 	.globl	commands
 	.section .rdata,"dr"
-.LC9:
+.LC6:
 	.ascii "clear\0"
-.LC10:
+.LC7:
 	.ascii "Clear the Terminal Screen\0"
-.LC11:
+.LC8:
 	.ascii "tree\0"
 	.align 8
-.LC12:
+.LC9:
 	.ascii "List directory contents in a tree structure\0"
-.LC13:
+.LC10:
 	.ascii "tree [directory]\0"
-.LC14:
+.LC11:
 	.ascii "exit\0"
-.LC15:
+.LC12:
 	.ascii "Exits the Application\0"
 	.data
 	.align 32
 commands:
-	.quad	.LC9
-	.quad	.LC10
-	.quad	.LC9
+	.quad	.LC6
+	.quad	.LC7
+	.quad	.LC6
 	.quad	cmd_clear
 	.long	0
 	.space 4
-	.quad	.LC11
-	.quad	.LC12
-	.quad	.LC13
+	.quad	.LC8
+	.quad	.LC9
+	.quad	.LC10
 	.quad	cmd_tree
 	.long	1
 	.space 4
-	.quad	.LC14
-	.quad	.LC15
-	.quad	.LC14
+	.quad	.LC11
+	.quad	.LC12
+	.quad	.LC11
 	.quad	cmd_exit
 	.long	0
 	.space 4
@@ -408,9 +334,9 @@ commands:
 	.align 4
 commands_count:
 	.long	3
-.LC16:
+.LC13:
 	.ascii " \12\0"
-.LC17:
+.LC14:
 	.ascii "Unknown command: '%s'.\12\0"
 	.text
 	.globl	handle
@@ -435,12 +361,12 @@ handle:
 	mov	QWORD PTR -32[rbp], rax
 	mov	DWORD PTR -4[rbp], 0
 	mov	rax, QWORD PTR 32[rbp]
-	lea	rdx, .LC16[rip]
+	lea	rdx, .LC13[rip]
 	mov	rcx, rax
 	call	strtok
 	mov	QWORD PTR -16[rbp], rax
-	jmp	.L29
-.L31:
+	jmp	.L22
+.L24:
 	mov	eax, DWORD PTR -4[rbp]
 	lea	edx, 1[rax]
 	mov	DWORD PTR -4[rbp], edx
@@ -452,31 +378,31 @@ handle:
 	mov	rcx, rax
 	call	strdup
 	mov	QWORD PTR [rbx], rax
-	lea	rax, .LC16[rip]
+	lea	rax, .LC13[rip]
 	mov	rdx, rax
 	mov	ecx, 0
 	call	strtok
 	mov	QWORD PTR -16[rbp], rax
-.L29:
+.L22:
 	cmp	QWORD PTR -16[rbp], 0
-	je	.L30
+	je	.L23
 	cmp	DWORD PTR -4[rbp], 9
-	jle	.L31
-.L30:
+	jle	.L24
+.L23:
 	cmp	DWORD PTR -4[rbp], 0
-	jne	.L32
+	jne	.L25
 	mov	rax, QWORD PTR -32[rbp]
 	mov	rcx, rax
 	call	free
-	jmp	.L28
-.L32:
+	jmp	.L21
+.L25:
 	mov	rax, QWORD PTR -32[rbp]
 	mov	rax, QWORD PTR [rax]
 	mov	rcx, rax
 	call	get_command_index
 	mov	DWORD PTR -36[rbp], eax
 	cmp	DWORD PTR -36[rbp], -1
-	je	.L34
+	je	.L27
 	mov	eax, DWORD PTR -36[rbp]
 	movsx	rdx, eax
 	mov	rax, rdx
@@ -487,7 +413,7 @@ handle:
 	lea	rax, commands[rip+32]
 	mov	eax, DWORD PTR [rdx+rax]
 	test	eax, eax
-	je	.L35
+	je	.L28
 	mov	ecx, 24
 	call	malloc
 	mov	QWORD PTR -48[rbp], rax
@@ -517,8 +443,8 @@ handle:
 	mov	ecx, 0
 	mov	rax, QWORD PTR __imp__beginthreadex[rip]
 	call	rax
-	jmp	.L28
-.L35:
+	jmp	.L21
+.L28:
 	mov	eax, DWORD PTR -36[rbp]
 	movsx	rdx, eax
 	mov	rax, rdx
@@ -533,8 +459,8 @@ handle:
 	mov	ecx, eax
 	call	r8
 	mov	DWORD PTR -20[rbp], 0
-	jmp	.L37
-.L38:
+	jmp	.L30
+.L31:
 	mov	eax, DWORD PTR -20[rbp]
 	cdqe
 	lea	rdx, 0[0+rax*8]
@@ -544,23 +470,23 @@ handle:
 	mov	rcx, rax
 	call	free
 	add	DWORD PTR -20[rbp], 1
-.L37:
+.L30:
 	mov	eax, DWORD PTR -20[rbp]
 	cmp	eax, DWORD PTR -4[rbp]
-	jl	.L38
+	jl	.L31
 	mov	rax, QWORD PTR -32[rbp]
 	mov	rcx, rax
 	call	free
-	jmp	.L28
-.L34:
+	jmp	.L21
+.L27:
 	mov	rax, QWORD PTR -32[rbp]
 	mov	rax, QWORD PTR [rax]
 	mov	rdx, rax
-	lea	rax, .LC17[rip]
+	lea	rax, .LC14[rip]
 	mov	rcx, rax
 	call	printf
 	nop
-.L28:
+.L21:
 	add	rsp, 104
 	pop	rbx
 	pop	rbp
@@ -571,9 +497,6 @@ handle:
 	.def	strcmp;	.scl	2;	.type	32;	.endef
 	.def	free;	.scl	2;	.type	32;	.endef
 	.def	system;	.scl	2;	.type	32;	.endef
-	.def	strncat;	.scl	2;	.type	32;	.endef
-	.def	strlen;	.scl	2;	.type	32;	.endef
-	.def	fgets;	.scl	2;	.type	32;	.endef
 	.def	list_dir;	.scl	2;	.type	32;	.endef
 	.def	fflush;	.scl	2;	.type	32;	.endef
 	.def	exit;	.scl	2;	.type	32;	.endef
