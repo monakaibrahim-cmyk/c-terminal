@@ -1,7 +1,8 @@
-#include <windows.h>
+#include <ctype.h>
+#include <direct.h>
 #include <stdio.h>
 #include <time.h>
-#include <ctype.h>
+#include <windows.h>
 
 #include "Helper.h"
 

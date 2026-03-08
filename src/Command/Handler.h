@@ -10,6 +10,8 @@
     #define pclose _pclose
     #define strdup _strdup
     #define strtok_s strtok_s
+
+	#include <direct.h>
 #else
     #include <stdatomic.h>
 #endif

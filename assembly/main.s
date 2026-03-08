@@ -58,11 +58,14 @@ msleep:
 	.seh_endproc
 	.def	__main;	.scl	2;	.type	32;	.endef
 	.section .rdata,"dr"
+	.align 8
 .LC0:
-	.ascii "Terminal App v1.0.\12\0"
+	.ascii "Terminal App v1.0. Type 'help' for commands.\12\0"
 .LC1:
 	.ascii "[CMD] >> \0"
 .LC2:
+	.ascii "\33[1A\33[2K\0"
+.LC3:
 	.ascii "\12\0"
 	.text
 	.globl	main
@@ -71,13 +74,13 @@ msleep:
 main:
 	push	rbp
 	.seh_pushreg	rbp
-	sub	rsp, 368
-	.seh_stackalloc	368
+	sub	rsp, 320
+	.seh_stackalloc	320
 	lea	rbp, 128[rsp]
 	.seh_setframe	rbp, 128
 	.seh_endprologue
-	mov	DWORD PTR 256[rbp], ecx
-	mov	QWORD PTR 264[rbp], rdx
+	mov	DWORD PTR 208[rbp], ecx
+	mov	QWORD PTR 216[rbp], rdx
 	call	__main
 	mov	ecx, 65001
 	mov	rax, QWORD PTR __imp_SetConsoleOutputCP[rip]
@@ -88,18 +91,17 @@ main:
 	lea	rax, .LC0[rip]
 	mov	rcx, rax
 	call	printf
-.L10:
 	jmp	.L5
 .L6:
 	mov	ecx, 100
 	call	msleep
 .L5:
 	mov	rax, QWORD PTR .refptr.is_busy[rip]
-	mov	QWORD PTR 232[rbp], rax
-	mov	rax, QWORD PTR 232[rbp]
+	mov	QWORD PTR 184[rbp], rax
+	mov	rax, QWORD PTR 184[rbp]
 	mov	eax, DWORD PTR [rax]
-	mov	DWORD PTR -76[rbp], eax
-	mov	eax, DWORD PTR -76[rbp]
+	mov	DWORD PTR -84[rbp], eax
+	mov	eax, DWORD PTR -84[rbp]
 	test	eax, eax
 	jne	.L6
 	lea	rax, .LC1[rip]
@@ -114,67 +116,40 @@ main:
 	mov	rax, QWORD PTR __imp___acrt_iob_func[rip]
 	call	rax
 	mov	rdx, rax
-	lea	rax, -32[rbp]
+	lea	rax, -80[rbp]
 	mov	r8, rdx
 	mov	edx, 256
 	mov	rcx, rax
 	call	fgets
 	test	rax, rax
-	jne	.L7
-	mov	eax, 0
-	jmp	.L11
-.L7:
-	mov	ecx, -11
-	mov	rax, QWORD PTR __imp_GetStdHandle[rip]
-	call	rax
-	mov	QWORD PTR 224[rbp], rax
-	lea	rdx, -64[rbp]
-	mov	rax, QWORD PTR 224[rbp]
+	je	.L13
+	lea	rax, .LC2[rip]
 	mov	rcx, rax
-	mov	rax, QWORD PTR __imp_GetConsoleScreenBufferInfo[rip]
-	call	rax
-	mov	WORD PTR -68[rbp], 0
-	movzx	eax, WORD PTR -58[rbp]
-	mov	WORD PTR -66[rbp], ax
-	movzx	eax, WORD PTR -64[rbp]
-	movsx	ecx, ax
-	mov	r8d, DWORD PTR -68[rbp]
-	mov	rax, QWORD PTR 224[rbp]
-	lea	rdx, -72[rbp]
-	mov	QWORD PTR 32[rsp], rdx
-	mov	r9d, r8d
-	mov	r8d, ecx
-	mov	edx, 32
-	mov	rcx, rax
-	mov	rax, QWORD PTR __imp_FillConsoleOutputCharacterA[rip]
-	call	rax
-	mov	edx, DWORD PTR -68[rbp]
-	mov	rax, QWORD PTR 224[rbp]
-	mov	rcx, rax
-	mov	rax, QWORD PTR __imp_SetConsoleCursorPosition[rip]
-	call	rax
+	call	printf
 	mov	ecx, 1
 	mov	rax, QWORD PTR __imp___acrt_iob_func[rip]
 	call	rax
 	mov	rcx, rax
 	call	fflush
-	lea	rax, -32[rbp]
-	lea	rdx, .LC2[rip]
+	lea	rax, -80[rbp]
+	lea	rdx, .LC3[rip]
 	mov	rcx, rax
 	call	strcspn
-	mov	BYTE PTR -32[rbp+rax], 0
-	lea	rax, -32[rbp]
+	mov	BYTE PTR -80[rbp+rax], 0
+	lea	rax, -80[rbp]
 	movzx	eax, BYTE PTR [rax]
 	test	al, al
-	je	.L10
-	lea	rax, -32[rbp]
+	je	.L5
+	lea	rax, -80[rbp]
 	mov	rcx, rax
 	call	handle
 	mov	ecx, 50
 	call	msleep
-	jmp	.L10
-.L11:
-	add	rsp, 368
+	jmp	.L5
+.L13:
+	nop
+	mov	eax, 0
+	add	rsp, 320
 	pop	rbp
 	ret
 	.seh_endproc

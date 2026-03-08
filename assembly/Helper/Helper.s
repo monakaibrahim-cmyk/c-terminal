@@ -230,7 +230,7 @@ StringToLower:
 .LC7:
 	.ascii "\342\224\234\342\224\200\342\224\200\0"
 .LC8:
-	.ascii "%s%s %s\12\0"
+	.ascii "%s%s \33[32m%s\33[0m\12\0"
 .LC9:
 	.ascii " \0"
 .LC10:

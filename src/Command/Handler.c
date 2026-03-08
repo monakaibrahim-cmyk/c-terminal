@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <process.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -147,6 +148,54 @@ void cmd_ping(int argc, char** argv)
     pclose(pipe);
 }
 
+void cmd_touch(int argc, char** argv)
+{
+	int idx = get_command_index(argv[0]);
+
+	if (argc < 2)
+	{
+        printf("%s\n", commands[idx].usage);
+        return;
+	}
+
+	char* path = argv[1];
+    char dir[256];
+    strncpy(dir, path, sizeof(dir) - 1);
+    dir[sizeof(dir) - 1] = '\0';
+
+	for (int i = 0; dir[i]; i++)
+	{
+		if (dir[i] == '/')
+		{
+			dir[i] = '\\';
+		}
+	}
+
+	char *sep = strrchr(dir, '\\');
+
+	if (sep != NULL)
+	{
+		*sep = '\0';
+
+		if (_mkdir(dir) != 0 && errno != EEXIST)
+		{
+			tprintf(FG_RED"Error: Could not create directory '%s' (Errno: %d)\n" RESET, dir, errno);
+			return;
+		}
+	}
+
+	FILE* file = fopen(path, "a");
+
+	if (!file)
+    {
+        perror("Error creating file");
+        return;
+    }
+
+	fclose(file);
+	tprintf("Touched: " FG_GREEN "%s" RESET "\n", argv[1]);
+}
+
 void cmd_exit(int argc, char** argv)
 {
 	system("cls");
@@ -181,6 +230,13 @@ Command commands[] =
 		"Pings a hostname.",
 		"ping <args> [hostname]",
 		cmd_ping,
+		1
+	},
+	{
+		"touch",
+		"Creates a file.",
+		"touch [file|path/to/file]",
+		cmd_touch,
 		1
 	},
 	{

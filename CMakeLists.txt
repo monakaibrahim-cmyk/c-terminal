@@ -19,8 +19,14 @@ target_include_directories(Terminal PRIVATE
 	src
 )
 
+target_link_libraries(Terminal shell32)
+
 if(MSVC)
     target_compile_options(Terminal PRIVATE /std:c11)
+endif()
+
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(Terminal PRIVATE -Wno-implicit-function-declaration)
 endif()
 
 set(ASM_OUTPUT_DIR "${CMAKE_SOURCE_DIR}/assembly")
