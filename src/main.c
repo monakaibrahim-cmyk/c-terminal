@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 	
 	char buffer[256];
 
-	printf("Terminal App v1.0.\n");
+	printf("Terminal App v1.0. Type 'help' for commands.\n");
 
 	while(1)
 	{
@@ -36,15 +36,7 @@ int main(int argc, char* argv[])
 		}
 
 		// Remove line
-		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-		CONSOLE_SCREEN_BUFFER_INFO csbi;
-		GetConsoleScreenBufferInfo(hConsole, &csbi);
-		
-		COORD coord = { 0, csbi.dwCursorPosition.Y };
-		DWORD written;
-		FillConsoleOutputCharacter(hConsole, ' ', csbi.dwSize.X, coord, &written);
-		SetConsoleCursorPosition(hConsole, coord);
-
+		printf("\033[1A\033[2K");
 		fflush(stdout);
 
 		buffer[strcspn(buffer, "\n")] = 0;

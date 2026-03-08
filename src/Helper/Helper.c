@@ -60,7 +60,7 @@ void list_dir(const char* base_path, const char* prefix, int is_last, int* file_
         char current_path[MAX_PATH];
         snprintf(current_path, MAX_PATH, "%s\\%s", base_path, entries[i].cFileName);
 
-        printf("%s%s %s\n", prefix, last_child ? "└──" : "├──", entries[i].cFileName);
+        printf("%s%s " FG_GREEN "%s" RESET "\n", prefix, last_child ? "└──" : "├──", entries[i].cFileName);
 
         if (entries[i].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
         {
