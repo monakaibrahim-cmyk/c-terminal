@@ -177,7 +177,7 @@ void cmd_touch(int argc, char** argv)
 	{
 		*sep = '\0';
 
-		if (_mkdir(dir) != 0 && errno != EEXIST)
+		if (mkdir(dir) != 0 && errno != EEXIST)
 		{
 			tprintf(FG_RED"Error: Could not create directory '%s' (Errno: %d)\n" RESET, dir, errno);
 			return;

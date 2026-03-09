@@ -3,6 +3,8 @@
 
 #ifdef _MSC_VER
     #include <windows.h>
+	#include <direct.h>
+
     #define atomic_int LONG
     #define atomic_load(x) InterlockedExchangeAdd(x, 0)
 
@@ -10,8 +12,8 @@
     #define pclose _pclose
     #define strdup _strdup
     #define strtok_s strtok_s
-
-	#include <direct.h>
+	
+	#define mkdir _mkdir
 #else
     #include <stdatomic.h>
 #endif
